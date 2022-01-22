@@ -12,6 +12,9 @@ export class General extends Document {
 
   @Prop()
   lastSubscriptionsRefresh: number;
+
+  @Prop()
+  proxyUntil: Date;
 }
 
 export const GeneralSchema = SchemaFactory.createForClass(General);

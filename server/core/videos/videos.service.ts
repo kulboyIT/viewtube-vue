@@ -15,6 +15,9 @@ import { Common } from '../common';
 import { DashGenerator } from './dash.generator';
 import { VideoBasicInfo } from './schemas/video-basic-info.schema';
 import { VideoEntity } from './video.entity';
+import { General } from 'common/general.schema';
+import { ChannelBasicInfoDto } from 'core/channels/dto/channel-basic-info.dto';
+import { VideoBasicInfoDto } from './dto/video-basic-info.dto';
 
 @Injectable()
 export class VideosService {
@@ -23,84 +26,50 @@ export class VideosService {
     private readonly videoModel: Model<VideoBasicInfo>,
     @InjectModel(ChannelBasicInfo.name)
     private readonly channelModel: Model<ChannelBasicInfo>,
-    private configService: ConfigService
+    private configService: ConfigService,
+    @InjectModel(General.name)
+    private readonly generalModel: Model<General>
   ) {}
 
   async getById(id: string): Promise<VideoDto> {
     const url: string = Common.youtubeVideoUrl + id;
-    let proxyAgent;
+    const generalConfig = await this.generalModel.findOne({ version: 1 }).exec();
 
-    if (this.configService.get('VIEWTUBE_PROXY_URL')) {
-      const proxy = this.configService.get('VIEWTUBE_PROXY_URL');
-      proxyAgent = HttpsProxyAgent(proxy);
-    }
-    const ytdlOptions: getInfoOptions = {
-      requestOptions: {}
-    };
-    if (this.configService.get('VIEWTUBE_YOUTUBE_COOKIE')) {
-      (ytdlOptions.requestOptions as any).cookie =
-        this.configService.get('VIEWTUBE_YOUTUBE_COOKIE');
-      if (this.configService.get('VIEWTUBE_YOUTUBE_IDENTIFIER')) {
-        ytdlOptions.requestOptions['x-youtube-identity-token'] = this.configService.get(
-          'VIEWTUBE_YOUTUBE_IDENTIFIER'
-        );
-      }
-    }
-    if (proxyAgent) {
-      (ytdlOptions.requestOptions as any).agent = proxyAgent;
-    }
+    const useProxy = generalConfig?.proxyUntil?.valueOf() > Date.now();
 
     try {
-      const result: videoInfo = await getInfo(url, ytdlOptions);
-
-      // const dashManifest = DashGenerator.generateDashFileFromFormats(
-      //   result.formats,
-      //   result.videoDetails.lengthSeconds
-      // );
-
-      const video: VideoDto = new VideoEntity(result);
-
-      // const channelBasicInfo: ChannelBasicInfoDto = {
-      //   authorId: video.authorId,
-      //   author: video.author,
-      //   authorThumbnails: video.authorThumbnails,
-      //   authorVerified: video.authorVerified
-      // };
-
-      // const authorImageUrl = await this.saveAuthorImage(
-      //   video.authorThumbnails[2].url,
-      //   video.authorId
-      // );
-      // if (authorImageUrl) {
-      //   channelBasicInfo.authorThumbnailUrl = authorImageUrl;
-      // }
-
-      // const videoBasicInfo: VideoBasicInfoDto = {
-      //   author: video.author,
-      //   authorId: video.authorId,
-      //   description: video.description,
-      //   dislikeCount: video.dislikeCount,
-      //   likeCount: video.likeCount,
-      //   published: video.published,
-      //   publishedText: video.publishedText,
-      //   title: video.title,
-      //   videoId: video.videoId,
-      //   videoThumbnails: video.videoThumbnails,
-      //   viewCount: video.viewCount,
-      //   lengthSeconds: video.lengthSeconds
-      // };
-
-      // this.channelModel
-      //   .findOneAndUpdate({ authorId: video.authorId }, channelBasicInfo, { upsert: true })
-      //   .exec()
-      //   .catch(Consola.warn);
-      // this.videoModel
-      //   .findOneAndUpdate({ videoId: video.videoId }, videoBasicInfo, { upsert: true })
-      //   .exec()
-      //   .catch(Consola.warn);
-
+      const video = this.fetchVideo(url, useProxy);
       return video;
     } catch (err) {
+      console.log('error fetching video');
+
+      if (!useProxy && this.configService.get('VIEWTUBE_PROXY_URL')) {
+        console.log('trying again with proxy');
+        try {
+          const video = await this.fetchVideo(url, true);
+
+          if (video && video.videoId) {
+            console.log('successful, using proxy for next hour');
+
+            const useProxyUntil = new Date();
+            useProxyUntil.setHours(useProxyUntil.getHours() + 1);
+            await this.generalModel
+              .findOneAndUpdate({ id: 1 }, { proxyUntil: useProxyUntil }, { upsert: true })
+              .exec();
+          }
+
+          return video;
+        } catch (err) {
+          throw new HttpException(
+            {
+              status: HttpStatus.INTERNAL_SERVER_ERROR,
+              message: err.address && err.code ? err : err.message
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+        }
+      }
+
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -109,6 +78,88 @@ export class VideosService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+
+  async fetchVideo(url: string, useExternalProxy?: boolean): Promise<VideoDto> {
+    const ytdlOptions: getInfoOptions = {
+      requestOptions: {
+        ...this.getYoutubeCookieConfig(),
+        ...(useExternalProxy ? this.getExternalProxyConfig() : {})
+      }
+    };
+
+    const result: videoInfo = await getInfo(url, ytdlOptions);
+    const video: VideoDto = new VideoEntity(result);
+
+    return video;
+  }
+
+  getExternalProxyConfig() {
+    const requestOptions: { [key: string]: any } = {};
+
+    if (this.configService.get('VIEWTUBE_PROXY_URL')) {
+      const proxy = this.configService.get('VIEWTUBE_PROXY_URL');
+      const proxyAgent = HttpsProxyAgent(proxy);
+      requestOptions.agent = proxyAgent;
+    }
+  }
+
+  getYoutubeCookieConfig() {
+    const requestOptions: { [key: string]: string } = {};
+
+    if (this.configService.get('VIEWTUBE_YOUTUBE_COOKIE')) {
+      requestOptions.cookie = this.configService.get('VIEWTUBE_YOUTUBE_COOKIE');
+    }
+    if (this.configService.get('VIEWTUBE_YOUTUBE_IDENTIFIER')) {
+      requestOptions['x-youtube-identity-token'] = this.configService.get(
+        'VIEWTUBE_YOUTUBE_IDENTIFIER'
+      );
+    }
+
+    return requestOptions;
+  }
+
+  async storeVideoInformation(video: VideoDto) {
+    const channelBasicInfo: ChannelBasicInfoDto = {
+      authorId: video.authorId,
+      author: video.author,
+      authorThumbnails: video.authorThumbnails,
+      authorVerified: video.authorVerified
+    };
+    const authorImageUrl = await this.saveAuthorImage(
+      video.authorThumbnails[2].url,
+      video.authorId
+    );
+    if (authorImageUrl) {
+      channelBasicInfo.authorThumbnailUrl = authorImageUrl;
+    }
+    const videoBasicInfo: VideoBasicInfoDto = {
+      author: video.author,
+      authorId: video.authorId,
+      description: video.description,
+      dislikeCount: video.dislikeCount,
+      likeCount: video.likeCount,
+      published: video.published,
+      publishedText: video.publishedText,
+      title: video.title,
+      videoId: video.videoId,
+      videoThumbnails: video.videoThumbnails,
+      viewCount: video.viewCount,
+      lengthSeconds: video.lengthSeconds
+    };
+    this.channelModel
+      .findOneAndUpdate({ authorId: video.authorId }, channelBasicInfo, { upsert: true })
+      .exec()
+      .catch();
+    this.videoModel
+      .findOneAndUpdate({ videoId: video.videoId }, videoBasicInfo, { upsert: true })
+      .exec()
+      .catch();
+
+    // const dashManifest = DashGenerator.generateDashFileFromFormats(
+    //   result.formats,
+    //   result.videoDetails.lengthSeconds
+    // );
   }
 
   async getDashManifest(id: string): Promise<string> {
