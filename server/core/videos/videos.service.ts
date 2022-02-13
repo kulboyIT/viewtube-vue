@@ -38,6 +38,7 @@ export class VideosService {
     const useProxy = generalConfig?.proxyUntil?.valueOf() > Date.now();
 
     try {
+      console.log('getting video without proxy');
       const video = this.fetchVideo(url, useProxy);
       return video;
     } catch (err) {

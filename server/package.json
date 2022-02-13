@@ -22,7 +22,7 @@
     }
   },
   "dependencies": {
-    "@freetube/yt-comment-scraper": "^6.0.0",
+    "@freetube/yt-comment-scraper": "6.1.0",
     "@nestjs/bull": "0.4.2",
     "@nestjs/common": "8.2.6",
     "@nestjs/config": "1.1.6",

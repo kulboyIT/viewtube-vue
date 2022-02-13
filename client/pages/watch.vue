@@ -144,7 +144,7 @@
               ><LoadMoreIcon />Try again</BadgeButton
             >
           </div>
-          <div v-if="!commentsLoading && comment" class="comments-container">
+          <div v-if="!commentsLoading && comment && comment.comments" class="comments-container">
             <Comment
               v-for="(subComment, i) in comment.comments"
               :key="i"

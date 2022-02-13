@@ -1502,12 +1502,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@freetube/yt-comment-scraper@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@freetube/yt-comment-scraper@npm:6.0.0"
+"@freetube/yt-comment-scraper@npm:6.1.0":
+  version: 6.1.0
+  resolution: "@freetube/yt-comment-scraper@npm:6.1.0"
   dependencies:
     axios: ^0.21.1
-  checksum: 2ee43a3375a4ac0467e150d748a3196f005a0f174cdda629185e953c66b854852850ca81068d932ae77b6f3ee20eee5ae02bb367686023da1ee93d7e32ad6ad2
+  checksum: f88f0bce2437b68003a48f74b66b0c00ea8fcf5ef88594f76791ed2849974bb530527c6271adffb5caba18884ebe7de6e1aedfa066d7e6619be92ef8eafa1392
   languageName: node
   linkType: hard
 
@@ -16236,7 +16236,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "server@workspace:server"
   dependencies:
-    "@freetube/yt-comment-scraper": ^6.0.0
+    "@freetube/yt-comment-scraper": 6.1.0
     "@nestjs/bull": 0.4.2
     "@nestjs/cli": 8.2.0
     "@nestjs/common": 8.2.6

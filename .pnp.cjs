@@ -2730,10 +2730,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@freetube/yt-comment-scraper", [
-        ["npm:6.0.0", {
-          "packageLocation": "./.yarn/cache/@freetube-yt-comment-scraper-npm-6.0.0-ed5f92c615-2ee43a3375.zip/node_modules/@freetube/yt-comment-scraper/",
+        ["npm:6.1.0", {
+          "packageLocation": "./.yarn/cache/@freetube-yt-comment-scraper-npm-6.1.0-43792179e5-f88f0bce24.zip/node_modules/@freetube/yt-comment-scraper/",
           "packageDependencies": [
-            ["@freetube/yt-comment-scraper", "npm:6.0.0"],
+            ["@freetube/yt-comment-scraper", "npm:6.1.0"],
             ["axios", "npm:0.21.4"]
           ],
           "linkType": "HARD",
@@ -20845,7 +20845,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./server/",
           "packageDependencies": [
             ["server", "workspace:server"],
-            ["@freetube/yt-comment-scraper", "npm:6.0.0"],
+            ["@freetube/yt-comment-scraper", "npm:6.1.0"],
             ["@nestjs/bull", "virtual:5e2e00b31e527ff544c90eb3e3e3e977a366e52a6e25602d03686a4c9a155eee4d7b92ccdea0b04275344f5b2189eb629d123eb4cc6e1b883b42aea6d965568d#npm:0.4.2"],
             ["@nestjs/cli", "npm:8.2.0"],
             ["@nestjs/common", "virtual:5e2e00b31e527ff544c90eb3e3e3e977a366e52a6e25602d03686a4c9a155eee4d7b92ccdea0b04275344f5b2189eb629d123eb4cc6e1b883b42aea6d965568d#npm:8.2.6"],
