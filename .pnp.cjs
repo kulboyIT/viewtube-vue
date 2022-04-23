@@ -8621,6 +8621,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["supports-color", "npm:7.2.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:5.0.1", {
+          "packageLocation": "./.yarn/cache/chalk-npm-5.0.1-6afcb94227-7b45300372.zip/node_modules/chalk/",
+          "packageDependencies": [
+            ["chalk", "npm:5.0.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["char-regex", [
@@ -20927,7 +20934,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["bull", "npm:4.8.2"],
             ["cache-manager", "npm:3.6.1"],
             ["cache-manager-redis-store", "npm:2.0.0"],
-            ["chalk", "npm:4.1.2"],
+            ["chalk", "npm:5.0.1"],
             ["class-transformer", "npm:0.5.1"],
             ["class-validator", "npm:0.13.2"],
             ["consola", "npm:2.15.3"],
