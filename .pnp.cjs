@@ -3270,8 +3270,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/rxjs", null],
             ["axios", "npm:0.26.1"],
             ["cache-manager", "npm:3.6.1"],
-            ["class-transformer", "npm:0.5.1"],
-            ["class-validator", "npm:0.13.2"],
+            ["class-transformer", null],
+            ["class-validator", null],
             ["iterare", "npm:1.2.1"],
             ["reflect-metadata", "npm:0.1.13"],
             ["rxjs", "npm:7.5.5"],
@@ -3515,8 +3515,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/class-validator", null],
             ["@types/nestjs__common", null],
             ["@types/reflect-metadata", null],
-            ["class-transformer", "npm:0.5.1"],
-            ["class-validator", "npm:0.13.2"],
+            ["class-transformer", null],
+            ["class-validator", null],
             ["reflect-metadata", "npm:0.1.13"]
           ],
           "packagePeers": [
@@ -3711,8 +3711,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/reflect-metadata", null],
             ["@types/swagger-ui-express", null],
             ["@types/typescript", null],
-            ["class-transformer", "npm:0.5.1"],
-            ["class-validator", "npm:0.13.2"],
+            ["class-transformer", null],
+            ["class-validator", null],
             ["fastify-swagger", [
               "@fastify/swagger",
               "npm:6.0.0"
@@ -21332,8 +21332,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["cache-manager", "npm:3.6.1"],
             ["cache-manager-redis-store", "npm:2.0.0"],
             ["chalk", "npm:4.1.2"],
-            ["class-transformer", "npm:0.5.1"],
-            ["class-validator", "npm:0.13.2"],
             ["consola", "npm:2.15.3"],
             ["cookie-parser", "npm:1.4.6"],
             ["cross-env", "npm:7.0.3"],
